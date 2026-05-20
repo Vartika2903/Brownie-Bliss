@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-mongoose.set('bufferCommands', false);
+mongoose.set("bufferCommands", false);
 
 let isConnected = false;
 
@@ -19,12 +19,12 @@ async function connectDB() {
       maxPoolSize: 1,
     });
     isConnected = true;
-    console.log('✅ Connected to MongoDB');
-    const Product = require('../models/Product');
+    console.log("✅ Connected to MongoDB");
+    const Product = require("../models/Product");
     await Product.seedProducts();
   } catch (err) {
     isConnected = false;
-    console.error('❌ MongoDB connection error:', err.message);
+    console.error("❌ MongoDB connection error:", err.message);
     throw err;
   }
 }

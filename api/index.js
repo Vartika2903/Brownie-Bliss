@@ -1,27 +1,29 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const serverless = require('serverless-http');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const serverless = require("serverless-http");
 
-const { connectDB } = require('./config/db');
-const adminRoutes = require('./routes/adminRoutes');
-const otpRoutes = require('./routes/otpRoutes');
-const productRoutes = require('./routes/productRoutes');
-const orderRoutes = require('./routes/orderRoutes');
+const { connectDB } = require("./config/db");
+const adminRoutes = require("./routes/adminRoutes");
+const otpRoutes = require("./routes/otpRoutes");
+const productRoutes = require("./routes/productRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // ─── GLOBAL MIDDLEWARE ──────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, "../public")));
 
 // ─── DB CONNECTION (per-request, serverless-safe) ───────────────────────────────
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) {
-  console.warn('⚠️  MONGO_URI is not set. Orders and products API run in memory/static mode until you restart the server.');
+  console.warn(
+    "⚠️  MONGO_URI is not set. Orders and products API run in memory/static mode until you restart the server.",
+  );
 }
 
 app.use(async (req, res, next) => {
@@ -30,33 +32,38 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
-    res.status(503).json({ success: false, message: `Database connection failed: ${err.message}` });
+    res
+      .status(503)
+      .json({
+        success: false,
+        message: `Database connection failed: ${err.message}`,
+      });
   }
 });
 
 // ─── API ROUTES ─────────────────────────────────────────────────────────────────
-app.use('/api/admin', adminRoutes);
-app.use('/api', otpRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api", otpRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
 // ─── STATIC FALLBACK ────────────────────────────────────────────────────────────
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
 // ─── GLOBAL ERROR HANDLER ──────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ success: false, message: 'Something went wrong!' });
+  res.status(500).json({ success: false, message: "Something went wrong!" });
 });
 
 // ─── LOCAL PORT BINDING ────────────────────────────────────────────────────────
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, (err) => {
     if (err) {
-      console.error('❌ Server startup error:', err);
+      console.error("❌ Server startup error:", err);
       return;
     }
     console.log(`🚀 Server listening on http://localhost:${PORT}`);
