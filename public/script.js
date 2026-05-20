@@ -868,8 +868,7 @@ function filterProducts(category, btn) {
                 <div class="product-price">₹${p.price}</div>
                 <button type="button" class="add-to-cart" data-product-id="${String(p.id)}">
                    Customize & Add
-                    <button>
-               
+               </button>
             </div>
         </div>
     `,
